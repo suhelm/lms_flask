@@ -239,7 +239,7 @@
                 </div>
                 <div style="display: flex; gap: 10px; align-items: center;">
                     <span class="due-badge">Due: {{ assignment.due_date }}</span>
-                    <button class="submit-btn">Submit</button>
+                    <a href="/student/assignment/{{ assignment.id }}/submit" class="submit-btn" style="text-decoration: none;">Submit</a>
                 </div>
             </div>
             {% endfor %}

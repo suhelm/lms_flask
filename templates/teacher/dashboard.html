@@ -218,7 +218,7 @@
                         <p>⏳ Credits: {{ course.credits }}</p>
                         <p>📅 Created: {{ course.created_at }}</p>
                     </div>
-                    <button class="course-btn">View Course</button>
+                    <a href="/teacher/course/{{ course.id }}" class="course-btn" style="text-decoration: none; display: block; text-align: center;">View Course</a>
                 </div>
                 {% endfor %}
             </div>
