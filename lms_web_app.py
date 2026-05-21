@@ -3,7 +3,7 @@ FLASK WEB INTERFACE FOR LMS SYSTEM
 REST API endpoints and HTML templates for web access
 """
 
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash
 from functools import wraps
 from datetime import datetime, timedelta
 import json
@@ -194,12 +194,13 @@ def view_course(course_id):
 def create_module(course_id):
     """Create a new module for a course"""
     teacher = TeacherManager(db, session['user_id'])
-    teacher.create_module(
+    success, msg = teacher.create_module(
         course_id=course_id,
         module_name=request.form.get('module_name'),
         description=request.form.get('description', ''),
         due_date=request.form.get('due_date') or None
     )
+    flash(msg, 'success' if success else 'error')
     return redirect(url_for('view_course', course_id=course_id))
 
 
@@ -209,10 +210,11 @@ def create_module(course_id):
 def enroll_student(course_id):
     """Enroll a student in a course by username or email"""
     teacher = TeacherManager(db, session['user_id'])
-    teacher.enroll_student(
+    success, msg = teacher.enroll_student(
         course_id=course_id,
         identifier=request.form.get('identifier', '').strip()
     )
+    flash(msg, 'success' if success else 'error')
     return redirect(url_for('view_course', course_id=course_id))
 
 

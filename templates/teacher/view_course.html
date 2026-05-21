@@ -47,6 +47,12 @@
             padding: 8px 18px; border-radius: 5px; cursor: pointer; font-size: 13px;
         }
         .inline-form button:hover { background: #764ba2; }
+        .flash {
+            padding: 12px 18px; border-radius: 6px; margin-bottom: 18px;
+            font-size: 14px;
+        }
+        .flash-success { background: #d1fae5; color: #065f46; border-left: 4px solid #10b981; }
+        .flash-error { background: #fee; color: #c33; border-left: 4px solid #c33; }
     </style>
 </head>
 <body>
@@ -55,6 +61,11 @@
         <a href="/teacher/dashboard">Dashboard</a>
     </div>
     <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
         <div class="card">
             <h2>{{ course.course_code }} — {{ course.course_name }}</h2>
             <p class="meta">{{ course.description }}</p>
