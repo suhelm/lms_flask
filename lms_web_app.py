@@ -25,6 +25,10 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 
 # Initialize database
 db = DatabaseManager("lms_web.db")
+
+# Fix database lock issue
+import sqlite3
+sqlite3.connect("lms_web.db", timeout=10.0).close()
 auth = AuthenticationManager(db)
 
 # ============================================================================
