@@ -188,6 +188,34 @@ def view_course(course_id):
                          enrollments=enrollments,
                          announcements=announcements)
 
+@app.route('/teacher/course/<int:course_id>/module/create', methods=['POST'])
+@login_required
+@teacher_required
+def create_module(course_id):
+    """Create a new module for a course"""
+    teacher = TeacherManager(db, session['user_id'])
+    teacher.create_module(
+        course_id=course_id,
+        module_name=request.form.get('module_name'),
+        description=request.form.get('description', ''),
+        due_date=request.form.get('due_date') or None
+    )
+    return redirect(url_for('view_course', course_id=course_id))
+
+
+@app.route('/teacher/course/<int:course_id>/enroll', methods=['POST'])
+@login_required
+@teacher_required
+def enroll_student(course_id):
+    """Enroll a student in a course by username or email"""
+    teacher = TeacherManager(db, session['user_id'])
+    teacher.enroll_student(
+        course_id=course_id,
+        identifier=request.form.get('identifier', '').strip()
+    )
+    return redirect(url_for('view_course', course_id=course_id))
+
+
 @app.route('/teacher/module/<int:module_id>/lessons')
 @login_required
 @teacher_required

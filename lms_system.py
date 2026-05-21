@@ -748,8 +748,38 @@ class TeacherManager:
         
         return enrollments
     
+    def enroll_student(self, course_id: int, identifier: str) -> Tuple[bool, str]:
+        """Enroll a student in a course by username or email"""
+        try:
+            conn = self.db.get_connection()
+            cursor = conn.cursor()
+
+            cursor.execute('''
+                SELECT id, first_name, last_name FROM users
+                WHERE (username = ? OR email = ?) AND role = 'student'
+            ''', (identifier, identifier))
+            student = cursor.fetchone()
+
+            if not student:
+                conn.close()
+                return False, f"No student found with username/email '{identifier}'"
+
+            cursor.execute('''
+                INSERT INTO enrollments (student_id, course_id, status)
+                VALUES (?, ?, 'active')
+            ''', (student['id'], course_id))
+
+            conn.commit()
+            conn.close()
+            return True, f"Enrolled {student['first_name']} {student['last_name']}"
+
+        except sqlite3.IntegrityError:
+            return False, "Student is already enrolled in this course"
+        except Exception as e:
+            return False, str(e)
+
     # ===== ANNOUNCEMENTS =====
-    
+
     def create_announcement(self, course_id: int, title: str, 
                            content: str) -> Tuple[bool, str]:
         """Create a course announcement"""
