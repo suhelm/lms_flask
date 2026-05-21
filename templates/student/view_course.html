@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ course.course_code }} - LMS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f7fa; }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; padding: 20px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .navbar h1 { font-size: 24px; }
+        .navbar a { color: white; text-decoration: none; padding: 8px 16px;
+                    background: rgba(255, 255, 255, 0.2); border-radius: 5px; }
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        .card { background: white; padding: 30px; border-radius: 10px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
+        h2 { color: #667eea; margin-bottom: 10px; }
+        .meta { color: #666; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>🎓 LMS - Student Portal</h1>
+        <a href="/student/dashboard">Dashboard</a>
+    </div>
+    <div class="container">
+        <div class="card">
+            <h2>{{ course.course_code }} — {{ course.course_name }}</h2>
+            <p class="meta">{{ course.description }}</p>
+            <p class="meta">📚 Semester: {{ course.semester }}</p>
+            <p class="meta">👨‍🏫 Instructor: {{ course.first_name }} {{ course.last_name }}</p>
+            <p class="meta">📅 Enrolled: {{ course.enrollment_date }}</p>
+        </div>
+    </div>
+</body>
+</html>

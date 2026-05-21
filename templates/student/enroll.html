@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enroll - LMS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f7fa; }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; padding: 20px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .navbar h1 { font-size: 24px; }
+        .navbar a { color: white; text-decoration: none; padding: 8px 16px;
+                    background: rgba(255, 255, 255, 0.2); border-radius: 5px; }
+        .container { max-width: 600px; margin: 40px auto; padding: 0 20px; }
+        .card { background: white; padding: 30px; border-radius: 10px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
+        h2 { color: #333; margin-bottom: 20px; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; margin-bottom: 6px; color: #555; font-weight: 600; font-size: 14px; }
+        input { width: 100%; padding: 10px 12px; border: 1px solid #ddd;
+                border-radius: 6px; font-size: 14px; }
+        .btn { background: #667eea; color: white; border: none;
+               padding: 12px 28px; border-radius: 6px; cursor: pointer; font-size: 15px; }
+        .btn:hover { background: #764ba2; }
+        .error { background: #fee; color: #c33; padding: 12px;
+                 border-radius: 6px; margin-bottom: 18px; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>🎓 LMS - Student Portal</h1>
+        <a href="/student/dashboard">Dashboard</a>
+    </div>
+    <div class="container">
+        <div class="card">
+            <h2>Enroll in a Course</h2>
+            {% if error %}<div class="error">{{ error }}</div>{% endif %}
+            <form method="POST" action="/student/enroll">
+                <div class="form-group">
+                    <label>Course ID</label>
+                    <input type="number" name="course_id" required placeholder="Enter the course ID">
+                </div>
+                <button type="submit" class="btn">Enroll</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

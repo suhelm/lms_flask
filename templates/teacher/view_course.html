@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ course.course_code }} - LMS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f7fa; }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; padding: 20px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .navbar h1 { font-size: 24px; }
+        .navbar a { color: white; text-decoration: none; padding: 8px 16px;
+                    background: rgba(255, 255, 255, 0.2); border-radius: 5px; }
+        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+        .card {
+            background: white; padding: 25px; border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); margin-bottom: 24px;
+        }
+        .card h2 { color: #667eea; margin-bottom: 10px; }
+        .card h3 { color: #333; margin-bottom: 14px; font-size: 18px; }
+        .meta { color: #666; font-size: 14px; margin-bottom: 6px; }
+        ul { list-style: none; }
+        li {
+            padding: 12px; border-bottom: 1px solid #eee;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        li:last-child { border-bottom: none; }
+        li a { color: #667eea; text-decoration: none; font-weight: 600; }
+        .empty { color: #999; font-style: italic; padding: 10px 0; }
+        .badge { background: #f5f7fa; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #555; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>🎓 LMS - Teacher Portal</h1>
+        <a href="/teacher/dashboard">Dashboard</a>
+    </div>
+    <div class="container">
+        <div class="card">
+            <h2>{{ course.course_code }} — {{ course.course_name }}</h2>
+            <p class="meta">{{ course.description }}</p>
+            <p class="meta">📚 Semester: {{ course.semester }} · ⏳ Credits: {{ course.credits }}</p>
+        </div>
+
+        <div class="card">
+            <h3>Modules</h3>
+            {% if modules %}
+            <ul>
+                {% for m in modules %}
+                <li>
+                    <div>
+                        <strong>{{ m.module_name }}</strong>
+                        <div class="meta">{{ m.description }}</div>
+                    </div>
+                    <a href="/teacher/module/{{ m.id }}/lessons">View Lessons →</a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}<p class="empty">No modules yet.</p>{% endif %}
+        </div>
+
+        <div class="card">
+            <h3>Enrolled Students</h3>
+            {% if enrollments %}
+            <ul>
+                {% for e in enrollments %}
+                <li>
+                    <div>
+                        <strong>{{ e.first_name }} {{ e.last_name }}</strong>
+                        <div class="meta">{{ e.email }}</div>
+                    </div>
+                    <span class="badge">{{ e.status }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}<p class="empty">No students enrolled.</p>{% endif %}
+        </div>
+
+        <div class="card">
+            <h3>Announcements</h3>
+            {% if announcements %}
+            <ul>
+                {% for a in announcements %}
+                <li style="flex-direction: column; align-items: flex-start;">
+                    <strong>{{ a.title }}</strong>
+                    <p class="meta">{{ a.content }}</p>
+                    <span class="badge">{{ a.created_at }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}<p class="empty">No announcements yet.</p>{% endif %}
+        </div>
+    </div>
+</body>
+</html>

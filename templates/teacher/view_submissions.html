@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submissions - LMS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f7fa; }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; padding: 20px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .navbar h1 { font-size: 24px; }
+        .navbar a { color: white; text-decoration: none; padding: 8px 16px;
+                    background: rgba(255, 255, 255, 0.2); border-radius: 5px; }
+        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+        .card { background: white; padding: 25px; border-radius: 10px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); margin-bottom: 16px; }
+        h3 { color: #667eea; margin-bottom: 8px; }
+        .meta { color: #666; font-size: 13px; margin-bottom: 12px; }
+        pre {
+            background: #f5f7fa; padding: 14px; border-radius: 6px;
+            overflow-x: auto; font-size: 13px; white-space: pre-wrap; margin-bottom: 12px;
+        }
+        .badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; }
+        .badge-submitted { background: #fef3c7; color: #92400e; }
+        .badge-graded { background: #d1fae5; color: #065f46; }
+        .grade-form { margin-top: 14px; padding-top: 14px; border-top: 1px solid #eee; }
+        .grade-form input, .grade-form textarea {
+            width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;
+            font-size: 13px; margin-bottom: 8px; font-family: inherit;
+        }
+        .grade-form button {
+            background: #667eea; color: white; border: none;
+            padding: 8px 18px; border-radius: 5px; cursor: pointer;
+        }
+        .empty { background: white; padding: 40px; text-align: center; border-radius: 10px;
+                 color: #666; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>🎓 LMS - Teacher Portal</h1>
+        <a href="/teacher/dashboard">Dashboard</a>
+    </div>
+    <div class="container">
+        {% if submissions %}
+            {% for s in submissions %}
+            <div class="card">
+                <h3>{{ s.first_name }} {{ s.last_name }} <span style="color: #999; font-weight: normal; font-size: 14px;">(@{{ s.username }})</span></h3>
+                <p class="meta">
+                    Submitted: {{ s.submitted_at }}
+                    <span class="badge {% if s.status == 'graded' %}badge-graded{% else %}badge-submitted{% endif %}">{{ s.status }}</span>
+                </p>
+                <pre>{{ s.submission_text }}</pre>
+                {% if s.points_earned is not none %}
+                    <p class="meta"><strong>Grade:</strong> {{ s.points_earned }} pts · <strong>Feedback:</strong> {{ s.feedback }}</p>
+                {% endif %}
+                <form class="grade-form" onsubmit="gradeSubmission(event, {{ s.id }})">
+                    <input type="number" step="0.5" name="points_earned" placeholder="Points earned" required>
+                    <textarea name="feedback" placeholder="Feedback for student" rows="2"></textarea>
+                    <button type="submit">Submit Grade</button>
+                </form>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty">No submissions yet for this assignment.</div>
+        {% endif %}
+    </div>
+    <script>
+        async function gradeSubmission(e, id) {
+            e.preventDefault();
+            const fd = new FormData(e.target);
+            const res = await fetch('/teacher/submission/' + id + '/grade', { method: 'POST', body: fd });
+            const data = await res.json();
+            alert(data.message);
+            if (data.success) location.reload();
+        }
+    </script>
+</body>
+</html>

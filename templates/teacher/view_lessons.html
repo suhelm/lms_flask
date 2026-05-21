@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lessons - LMS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f7fa; }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; padding: 20px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .navbar h1 { font-size: 24px; }
+        .navbar a { color: white; text-decoration: none; padding: 8px 16px;
+                    background: rgba(255, 255, 255, 0.2); border-radius: 5px; }
+        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+        .card { background: white; padding: 25px; border-radius: 10px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); margin-bottom: 16px; }
+        h2 { color: #667eea; margin-bottom: 8px; }
+        .meta { color: #666; font-size: 13px; margin-bottom: 8px; }
+        .content { color: #444; line-height: 1.6; }
+        .badge { background: #f5f7fa; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #555; }
+        .empty { background: white; padding: 40px; text-align: center; border-radius: 10px;
+                 color: #666; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>🎓 LMS - Teacher Portal</h1>
+        <a href="/teacher/dashboard">Dashboard</a>
+    </div>
+    <div class="container">
+        {% if lessons %}
+            {% for l in lessons %}
+            <div class="card">
+                <h2>{{ l.lesson_name }}</h2>
+                <p class="meta"><span class="badge">{{ l.lesson_type }}</span> · Created {{ l.created_at }}</p>
+                <p class="content">{{ l.content }}</p>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty">No lessons in this module yet.</div>
+        {% endif %}
+    </div>
+</body>
+</html>
