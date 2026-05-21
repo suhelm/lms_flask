@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard - LMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar h1 {
+            font-size: 24px;
+        }
+        
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .navbar a:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .welcome {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .welcome h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .welcome p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .action-btn {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            color: #333;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .action-btn h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .action-btn p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .courses-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .course-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #667eea;
+            transition: transform 0.2s;
+        }
+        
+        .course-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .course-card h4 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+        
+        .course-card p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .course-card .details {
+            background: #f5f7fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 13px;
+            color: #555;
+            margin-top: 10px;
+        }
+        
+        .course-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        
+        .course-btn:hover {
+            background: #764ba2;
+        }
+        
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>🎓 LMS - Teacher Portal</h1>
+        <div>
+            <span>Welcome, {{ name }}</span>
+            <a href="/logout" style="margin-left: 20px;">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="welcome">
+            <h2>Welcome back, {{ name }}!</h2>
+            <p>Manage your courses, view student submissions, and grade assignments.</p>
+        </div>
+        
+        <div class="actions">
+            <a href="/teacher/course/create" class="action-btn">
+                <h3>➕ Create Course</h3>
+                <p>Start a new course</p>
+            </a>
+            <div class="action-btn">
+                <h3>📊 View Submissions</h3>
+                <p>Grade student work</p>
+            </div>
+            <div class="action-btn">
+                <h3>📢 Send Announcement</h3>
+                <p>Notify your class</p>
+            </div>
+        </div>
+        
+        <div class="courses-section">
+            <h3>My Courses</h3>
+            
+            {% if courses %}
+            <div class="courses-grid">
+                {% for course in courses %}
+                <div class="course-card">
+                    <h4>{{ course.course_code }}</h4>
+                    <p><strong>{{ course.course_name }}</strong></p>
+                    <p>{{ course.description }}</p>
+                    <div class="details">
+                        <p>📚 Semester: {{ course.semester }}</p>
+                        <p>⏳ Credits: {{ course.credits }}</p>
+                        <p>📅 Created: {{ course.created_at }}</p>
+                    </div>
+                    <button class="course-btn">View Course</button>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-message">
+                <p>No courses yet. <a href="/teacher/course/create" style="color: #667eea; text-decoration: underline;">Create your first course</a></p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
