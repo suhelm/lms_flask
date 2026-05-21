@@ -19,11 +19,50 @@
         .card { background: white; padding: 25px; border-radius: 10px;
                 box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); margin-bottom: 16px; }
         h2 { color: #667eea; margin-bottom: 8px; }
+        h3 { color: #333; margin-bottom: 14px; }
         .meta { color: #666; font-size: 13px; margin-bottom: 8px; }
-        .content { color: #444; line-height: 1.6; }
-        .badge { background: #f5f7fa; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #555; }
+        .content { color: #444; line-height: 1.6; white-space: pre-wrap; }
+        .badge { background: #f5f7fa; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #555; text-transform: uppercase; }
         .empty { background: white; padding: 40px; text-align: center; border-radius: 10px;
-                 color: #666; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
+                 color: #666; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); margin-bottom: 16px; }
+
+        .form-card { background: white; padding: 25px; border-radius: 10px;
+                     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); margin-bottom: 24px; }
+        .form-row { display: flex; gap: 10px; margin-bottom: 12px; }
+        .form-row input, .form-row select {
+            padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;
+        }
+        .form-row input[name="lesson_name"] { flex: 1; }
+        textarea {
+            width: 100%; padding: 12px; border: 1px solid #ddd;
+            border-radius: 6px; font-size: 14px; font-family: 'Courier New', monospace;
+            min-height: 140px; margin-bottom: 12px;
+        }
+        button.btn {
+            background: #667eea; color: white; border: none;
+            padding: 10px 22px; border-radius: 6px; cursor: pointer; font-size: 14px;
+        }
+        button.btn:hover { background: #764ba2; }
+        .hint { font-size: 12px; color: #888; margin-bottom: 10px; }
+
+        .video-frame {
+            position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;
+            margin-top: 10px; border-radius: 8px; background: #000;
+        }
+        .video-frame iframe, .video-frame video {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;
+        }
+
+        .quiz-question { margin-bottom: 16px; padding: 14px; background: #f9fafb; border-radius: 6px; }
+        .quiz-question p { font-weight: 600; margin-bottom: 8px; }
+        .quiz-question label { display: block; padding: 6px 0; cursor: pointer; }
+        .quiz-result { margin-top: 12px; padding: 10px; border-radius: 6px; font-weight: 600; display: none; }
+        .quiz-result.pass { background: #d1fae5; color: #065f46; }
+        .quiz-result.fail { background: #fee; color: #c33; }
+
+        .flash { padding: 12px 18px; border-radius: 6px; margin-bottom: 18px; font-size: 14px; }
+        .flash-success { background: #d1fae5; color: #065f46; border-left: 4px solid #10b981; }
+        .flash-error { background: #fee; color: #c33; border-left: 4px solid #c33; }
     </style>
 </head>
 <body>
@@ -32,17 +71,120 @@
         <a href="/teacher/dashboard">Dashboard</a>
     </div>
     <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <div class="form-card">
+            <h3>Add Lesson</h3>
+            <form method="POST" action="/teacher/module/{{ module_id }}/lesson/create">
+                <div class="form-row">
+                    <input type="text" name="lesson_name" placeholder="Lesson name" required>
+                    <select name="lesson_type" id="lesson-type" onchange="updateHint()">
+                        <option value="text">Text</option>
+                        <option value="video">Video URL</option>
+                        <option value="quiz">Quiz</option>
+                    </select>
+                </div>
+                <div class="hint" id="hint">Plain text content. Newlines preserved.</div>
+                <textarea name="content" id="content" required></textarea>
+                <button type="submit" class="btn">+ Add Lesson</button>
+            </form>
+        </div>
+
         {% if lessons %}
             {% for l in lessons %}
             <div class="card">
                 <h2>{{ l.lesson_name }}</h2>
                 <p class="meta"><span class="badge">{{ l.lesson_type }}</span> · Created {{ l.created_at }}</p>
-                <p class="content">{{ l.content }}</p>
+
+                {% if l.lesson_type == 'video' %}
+                    <div class="video-frame" data-url="{{ l.content }}"></div>
+                {% elif l.lesson_type == 'quiz' %}
+                    <div class="quiz" data-json='{{ l.content }}' data-id="{{ l.id }}"></div>
+                {% else %}
+                    <p class="content">{{ l.content }}</p>
+                {% endif %}
             </div>
             {% endfor %}
         {% else %}
             <div class="empty">No lessons in this module yet.</div>
         {% endif %}
     </div>
+
+    <script>
+        const HINTS = {
+            text: 'Plain text content. Newlines preserved.',
+            video: 'Paste a YouTube, Vimeo, or direct .mp4 URL. It will be embedded in a player.',
+            quiz: 'Paste JSON array of questions, e.g.\n[{"q":"2+2?","options":["3","4","5"],"answer":1}]'
+        };
+        function updateHint() {
+            const t = document.getElementById('lesson-type').value;
+            document.getElementById('hint').textContent = HINTS[t];
+            document.getElementById('content').placeholder = HINTS[t];
+        }
+        updateHint();
+
+        function toEmbed(url) {
+            const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+            if (yt) return { type: 'iframe', src: 'https://www.youtube.com/embed/' + yt[1] };
+            const vimeo = url.match(/vimeo\.com\/(\d+)/);
+            if (vimeo) return { type: 'iframe', src: 'https://player.vimeo.com/video/' + vimeo[1] };
+            if (/\.(mp4|webm|ogg)(\?|$)/i.test(url)) return { type: 'video', src: url };
+            return { type: 'iframe', src: url };
+        }
+
+        document.querySelectorAll('.video-frame').forEach(div => {
+            const url = (div.dataset.url || '').trim();
+            if (!url) return;
+            const embed = toEmbed(url);
+            if (embed.type === 'video') {
+                div.innerHTML = '<video controls src="' + embed.src + '"></video>';
+            } else {
+                div.innerHTML = '<iframe src="' + embed.src + '" allowfullscreen></iframe>';
+            }
+        });
+
+        document.querySelectorAll('.quiz').forEach(div => {
+            let questions;
+            try { questions = JSON.parse(div.dataset.json); }
+            catch (e) {
+                div.innerHTML = '<p style="color:#c33;">Invalid quiz JSON.</p>';
+                return;
+            }
+            const id = div.dataset.id;
+            let html = '<form onsubmit="return scoreQuiz(event,' + id + ')">';
+            questions.forEach((q, i) => {
+                html += '<div class="quiz-question"><p>' + (i + 1) + '. ' + q.q + '</p>';
+                q.options.forEach((opt, j) => {
+                    html += '<label><input type="radio" name="q' + i + '" value="' + j + '"> ' + opt + '</label>';
+                });
+                html += '</div>';
+            });
+            html += '<button type="submit" class="btn">Check Answers</button>';
+            html += '<div class="quiz-result" id="qr-' + id + '"></div></form>';
+            div.innerHTML = html;
+            div._questions = questions;
+        });
+
+        function scoreQuiz(e, id) {
+            e.preventDefault();
+            const div = document.querySelector('.quiz[data-id="' + id + '"]');
+            const qs = div._questions;
+            let correct = 0;
+            qs.forEach((q, i) => {
+                const picked = e.target['q' + i].value;
+                if (parseInt(picked) === q.answer) correct++;
+            });
+            const result = document.getElementById('qr-' + id);
+            const pct = Math.round(100 * correct / qs.length);
+            result.style.display = 'block';
+            result.className = 'quiz-result ' + (pct >= 60 ? 'pass' : 'fail');
+            result.textContent = 'Score: ' + correct + ' / ' + qs.length + ' (' + pct + '%)';
+            return false;
+        }
+    </script>
 </body>
 </html>

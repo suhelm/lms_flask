@@ -225,8 +225,25 @@ def view_module_lessons(module_id):
     """View module lessons"""
     teacher = TeacherManager(db, session['user_id'])
     lessons = teacher.get_module_lessons(module_id)
-    
-    return render_template('teacher/view_lessons.html', lessons=lessons)
+
+    return render_template('teacher/view_lessons.html',
+                           lessons=lessons, module_id=module_id)
+
+
+@app.route('/teacher/module/<int:module_id>/lesson/create', methods=['POST'])
+@login_required
+@teacher_required
+def create_lesson(module_id):
+    """Create a lesson (text / video / quiz) in a module"""
+    teacher = TeacherManager(db, session['user_id'])
+    success, msg = teacher.create_lesson(
+        module_id=module_id,
+        lesson_name=request.form.get('lesson_name'),
+        content=request.form.get('content', ''),
+        lesson_type=request.form.get('lesson_type', 'text'),
+    )
+    flash(msg, 'success' if success else 'error')
+    return redirect(url_for('view_module_lessons', module_id=module_id))
 
 @app.route('/teacher/lesson/<int:lesson_id>/assignments')
 @login_required
