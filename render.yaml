@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: lms-system
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn lms_web_app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        value: your-secret-key-change-in-production
+databases:
+  - name: lms_db
+    databaseName: lms_system
+    user: lms_user
